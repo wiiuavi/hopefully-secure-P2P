@@ -28,15 +28,14 @@ bigLargePrime = int(bigLargePrimeHexa, 16)
 generatorNumber = 2
 
 
-def main():
-    mySecretNumber = secrets.randbits(256)
+def generatePublicKey(mySecretNumber):
     #myPublicKey = (generatorNumber^^bigLargePrime)%p
     #this insta crashes, in-brackets too large
     #below will apply modulo alongside, not after calculating the big 2^expo
     myPublicKey = pow(generatorNumber, mySecretNumber, bigLargePrime)
     return myPublicKey
 
-def main2(mySecretNumber,theirPublicKey):
+def generatePrivateKey(mySecretNumber,theirPublicKey):
     privateKey = pow(theirPublicKey, mySecretNumber, bigLargePrime)
     return privateKey
 

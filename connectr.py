@@ -1,21 +1,60 @@
 import socket
 import struct
 import os
+from keymaker import generatePrivateKey, generatePublicKey
+from encryptionengine import encryptionToggleMessage
+import secrets
 
-hostname = socket.gethostname()
-ip = socket.gethostbyname(hostname)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(("0.0.0.0", 5001))
+mySecretNumber = secrets.randbits(256)
 
-# server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# server.bind(("0.0.0.0", 6767))
-# server.listen(1)
-# print("listening on port 6767")
-# client_socket, client_address = server.accept()
-# print(f"connected to {client_address}")
-# incoming_data = client_socket.recv(4096)
-# recieved_message = incoming_data.encode("utf-8")
-# print(f"got response from {client_address}")
-# response_message = "message"
-# client_socket.send(response_message.encode("utf-8"))
-# client_socket.close()
-# server.close()
+def searchForClient():
+    server.listen(1)
+    print("listening 5001")
+    clientSocket, clientAddress = server.accept()
+    print(f"connected to {clientAddress}")
+    return clientSocket, clientAddress
+
+def doSomethingWithKey(opcode): #0x02 -> sending public key
+    myPublicKey = generatePublicKey(mySecretNumber)
+    myPublicKeyBytes = myPublicKey.to_bytes(256, byteorder="big")
+    payloadLength = 256
+    packet = struct.packet("!BI256s", opcode, payloadLength, myPublicKeyBytes)
+    connectedClient.send(packet)
+
+
+
+connectedClient, clientIp = searchForClient()
+headerBytes = connectedClient.recv(5)
+opcode, payloadLength = struct.unpack("!BI", headerBytes)
+payloadBytes = connectedClient.recv(payloadLength)
+if opcode == 0x02:
+    theirPublicKey = int.from_bytes(payloadBytes, byteorder="big")
+    thePrivateKey = generatePrivateKey(mySecretNumber, theirPublicKey)
+
+##################################Handshake done
+
+while True:
+    try:
+        headerBytes = connectedClient.recv(5)
+        if not headerBytes:
+            break
+        opcode, payloadLength = struct.unpack("!BI", headerBytes)
+        payloadBytes = connectedClient.recv(payloadLength)
+        if opcode == 0x03:
+            decryptedBytes = encryptionToggleMessage(payloadBytes, thePrivateKey)
+            responseMessage = decryptedBytes.decode("utf-8")
+            print(f"recieved: {responseMessage}")
+    except ConnectionResetError:
+        break
+print("client disconnected.")
+connectedClient.close()
+server.close()
+
+
+
+
+
+
 
