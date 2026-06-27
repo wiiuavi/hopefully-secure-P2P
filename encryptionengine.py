@@ -25,12 +25,13 @@ def encryptionToggleMessage(messageBytes, thePrivateKey):
     return encryptedBytes
 
 #test
-from keymaker import generatePrivateKey, generatePublicKey
-import secrets
-message = "hello"
-messageBytes = message.encode("utf-8")
-mySecretNumber = secrets.randbits(256)
-key = generatePrivateKey(mySecretNumber, generatePublicKey(mySecretNumber))
-print("the OG message is: " + str(message))
-print("the encoded message is: " + str(encryptionToggleMessage(messageBytes, key)))
-print("running this through the same function returns: " + str(encryptionToggleMessage(encryptionToggleMessage(messageBytes, key), key).decode("utf-8")))
+def test():
+    from keymaker import generatePrivateKey, generatePublicKey
+    import secrets
+    message = "hello"
+    messageBytes = message.encode("utf-8")
+    mySecretNumber = secrets.randbits(256)
+    key = generatePrivateKey(mySecretNumber, generatePublicKey(mySecretNumber))
+    print("the OG message is: " + str(message))
+    print("the encoded message is: " + str(encryptionToggleMessage(messageBytes, key)))
+    print("running this through the same function returns: " + str(encryptionToggleMessage(encryptionToggleMessage(messageBytes, key), key).decode("utf-8")))

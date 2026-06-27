@@ -13,18 +13,20 @@ def doSomethingWithKey(opcode, socket): #0x02 -> sending public key
     myPublicKey = generatePublicKey(mySecretNumber)
     myPublicKeyBytes = myPublicKey.to_bytes(256, byteorder="big")
     payloadLength = 256
-    packet = struct.packet("!BI256s", opcode, payloadLength, myPublicKeyBytes)
+    packet = struct.pack("!BI256s", opcode, payloadLength, myPublicKeyBytes)
     socket.send(packet)
 
 
 doSomethingWithKey(0x02, clientSocket)
+#print("reached1")
 
 headerBytes = clientSocket.recv(5)
+#print("reached2")
 opcode, payloadLength = struct.unpack("!BI", headerBytes)
 payloadBytes = clientSocket.recv(payloadLength)
+#print("reached3")
 if opcode == 0x02:
     theirPublicKey = int.from_bytes(payloadBytes, byteorder="big")
-    doSomethingWithKey(0x02, clientSocket)
     thePrivateKey = generatePrivateKey(mySecretNumber, theirPublicKey)
 ########################################handshake done
 while True:

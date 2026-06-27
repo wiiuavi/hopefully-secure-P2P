@@ -16,12 +16,12 @@ def searchForClient():
     print(f"connected to {clientAddress}")
     return clientSocket, clientAddress
 
-def doSomethingWithKey(opcode): #0x02 -> sending public key
+def doSomethingWithKey(opcode, socket): #0x02 -> sending public key
     myPublicKey = generatePublicKey(mySecretNumber)
     myPublicKeyBytes = myPublicKey.to_bytes(256, byteorder="big")
     payloadLength = 256
-    packet = struct.packet("!BI256s", opcode, payloadLength, myPublicKeyBytes)
-    connectedClient.send(packet)
+    packet = struct.pack("!BI256s", opcode, payloadLength, myPublicKeyBytes)
+    socket.send(packet)
 
 
 
@@ -31,6 +31,7 @@ opcode, payloadLength = struct.unpack("!BI", headerBytes)
 payloadBytes = connectedClient.recv(payloadLength)
 if opcode == 0x02:
     theirPublicKey = int.from_bytes(payloadBytes, byteorder="big")
+    doSomethingWithKey(0x02, connectedClient)
     thePrivateKey = generatePrivateKey(mySecretNumber, theirPublicKey)
 
 ##################################Handshake done
