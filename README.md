@@ -5,8 +5,8 @@ This is my attempt at making a simple secure peer to peer client, using cryptogr
 This program uses the Diffie Hellman key exchange, where both parties exchange a number 2^(random int) mod p, where p is a very large prime. Both then perform (key recieved)^(their random int) mod p, now holding the same private key, as any unwanted traffic won't know the random number. The program applies a bit-by-bit XOR mask to encrypt text, this also allows the same function to decrypt.
 
 # Install
-run the .exe
-or clone the repo and pip install -r requirements.txt (optionally but recomended, do so in a venv)
+run the .exe  
+or clone the repo and pip install -r requirements.txt (optionally but recomended, do so in a venv), then run main.py
 
 # Usage
 upon running the program, you will see this screen:
